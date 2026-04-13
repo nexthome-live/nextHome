@@ -19,6 +19,9 @@ public class CorsConfig {
     @Value("${cors.allowed-methods:GET,POST,PUT,DELETE,OPTIONS}")
     private String allowedMethods;
 
+    @Value("${cors.allowed-headers:Content-Type,Accept,Authorization,X-Management-Token}")
+    private String allowedHeaders;
+
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
@@ -29,7 +32,7 @@ public class CorsConfig {
             config.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
         }
         config.setAllowedMethods(Arrays.asList(allowedMethods.split(",")));
-        config.setAllowedHeaders(List.of("Content-Type", "Accept", "Authorization", "X-Management-Token"));
+        config.setAllowedHeaders(Arrays.asList(allowedHeaders.split(",")));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
