@@ -51,6 +51,7 @@ steps:
           --region "${_REGION}" \
           --platform managed \
           --allow-unauthenticated \
+          --ingress internal \
           --port 8080 \
           --set-env-vars "SERVER_PORT=8080,DB_URL=${_DB_URL}" \
           --set-secrets "DB_USERNAME=${_DB_USERNAME_SECRET}:latest,DB_PASSWORD=${_DB_PASSWORD_SECRET}:latest" \
@@ -61,6 +62,7 @@ steps:
           --region "${_REGION}" \
           --platform managed \
           --allow-unauthenticated \
+          --ingress internal \
           --port 8080 \
           --set-env-vars "SERVER_PORT=8080,VACANCY_SERVICE_URL=$$VACANCY_URL" \
           --format='value(status.url)')

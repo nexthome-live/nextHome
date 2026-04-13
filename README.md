@@ -132,6 +132,7 @@ Backend-only deployment files are included:
 
 - `DB_USERNAME_SECRET_NAME` and `DB_PASSWORD_SECRET_NAME` must already exist in Google Secret Manager.
 - The workflow deploys only backend services (vacancy, search, gateway), not the frontend.
+- Cloud Run ingress is restricted to internal traffic for `vacancy-service` and `search-service`; only `gateway-service` is publicly reachable.
 
 ## Phase coverage
 
