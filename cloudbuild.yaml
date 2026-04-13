@@ -1,4 +1,4 @@
-# NOTE: Keep this file in sync with cloudbuild.yaml.
+# NOTE: Keep this file in sync with cloudbuild.backend.yaml.
 steps:
   - name: gcr.io/cloud-builders/docker
     args:
