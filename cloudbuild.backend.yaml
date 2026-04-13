@@ -1,0 +1,88 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_VACANCY_SERVICE}:$SHORT_SHA
+      - /workspace/backend/vacancy-service
+
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_VACANCY_SERVICE}:$SHORT_SHA
+
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SEARCH_SERVICE}:$SHORT_SHA
+      - /workspace/backend/search-service
+
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SEARCH_SERVICE}:$SHORT_SHA
+
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_GATEWAY_SERVICE}:$SHORT_SHA
+      - /workspace/backend/gateway-service
+
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_GATEWAY_SERVICE}:$SHORT_SHA
+
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        set -euo pipefail
+
+        VACANCY_IMAGE="${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_VACANCY_SERVICE}:$SHORT_SHA"
+        SEARCH_IMAGE="${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SEARCH_SERVICE}:$SHORT_SHA"
+        GATEWAY_IMAGE="${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_GATEWAY_SERVICE}:$SHORT_SHA"
+
+        VACANCY_URL=$$(gcloud run deploy "${_VACANCY_SERVICE}" \
+          --image "$$VACANCY_IMAGE" \
+          --region "${_REGION}" \
+          --platform managed \
+          --allow-unauthenticated \
+          --port 8080 \
+          --set-env-vars "SERVER_PORT=8080,DB_URL=${_DB_URL}" \
+          --set-secrets "DB_USERNAME=${_DB_USERNAME_SECRET}:latest,DB_PASSWORD=${_DB_PASSWORD_SECRET}:latest" \
+          --format='value(status.url)')
+
+        SEARCH_URL=$$(gcloud run deploy "${_SEARCH_SERVICE}" \
+          --image "$$SEARCH_IMAGE" \
+          --region "${_REGION}" \
+          --platform managed \
+          --allow-unauthenticated \
+          --port 8080 \
+          --set-env-vars "SERVER_PORT=8080,VACANCY_SERVICE_URL=$$VACANCY_URL" \
+          --format='value(status.url)')
+
+        gcloud run deploy "${_GATEWAY_SERVICE}" \
+          --image "$$GATEWAY_IMAGE" \
+          --region "${_REGION}" \
+          --platform managed \
+          --allow-unauthenticated \
+          --port 8080 \
+          --set-env-vars "SERVER_PORT=8080,VACANCY_SERVICE_URL=$$VACANCY_URL,SEARCH_SERVICE_URL=$$SEARCH_URL,CORS_ALLOWED_ORIGINS=${_CORS_ALLOWED_ORIGINS}"
+
+substitutions:
+  _REGION: us-central1
+  _REPOSITORY: nexthome-backend
+  _VACANCY_SERVICE: vacancy-service
+  _SEARCH_SERVICE: search-service
+  _GATEWAY_SERVICE: gateway-service
+  _DB_URL: jdbc:mysql://PUBLIC_DB_HOST:3306/vacancy_db
+  _DB_USERNAME_SECRET: vacancy-db-username
+  _DB_PASSWORD_SECRET: vacancy-db-password
+  _CORS_ALLOWED_ORIGINS: https://nexthome-live.github.io
+
+options:
+  logging: CLOUD_LOGGING_ONLY
