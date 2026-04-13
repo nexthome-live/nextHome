@@ -26,10 +26,11 @@ public class CorsConfig {
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(false);
-        if ("*".equals(allowedOrigins.trim())) {
+        String trimmedOrigins = allowedOrigins.trim();
+        if (trimmedOrigins.isEmpty() || "*".equals(trimmedOrigins)) {
             config.setAllowedOriginPatterns(List.of("*"));
         } else {
-            config.setAllowedOrigins(Arrays.stream(allowedOrigins.split(","))
+            config.setAllowedOrigins(Arrays.stream(trimmedOrigins.split(","))
                     .map(String::trim).filter(s -> !s.isEmpty()).toList());
         }
         config.setAllowedMethods(Arrays.stream(allowedMethods.split(","))
