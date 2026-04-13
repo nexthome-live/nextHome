@@ -29,10 +29,13 @@ public class CorsConfig {
         if ("*".equals(allowedOrigins.trim())) {
             config.setAllowedOriginPatterns(List.of("*"));
         } else {
-            config.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
+            config.setAllowedOrigins(Arrays.stream(allowedOrigins.split(","))
+                    .map(String::trim).filter(s -> !s.isEmpty()).toList());
         }
-        config.setAllowedMethods(Arrays.asList(allowedMethods.split(",")));
-        config.setAllowedHeaders(Arrays.asList(allowedHeaders.split(",")));
+        config.setAllowedMethods(Arrays.stream(allowedMethods.split(","))
+                .map(String::trim).filter(s -> !s.isEmpty()).toList());
+        config.setAllowedHeaders(Arrays.stream(allowedHeaders.split(","))
+                .map(String::trim).filter(s -> !s.isEmpty()).toList());
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

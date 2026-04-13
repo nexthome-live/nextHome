@@ -128,9 +128,9 @@ Backend deployment files are included:
 ## Phase coverage
 
 Implemented now:
-- Vacancy service token-based post/list/update/delete
+- Vacancy token-based post/list/update/delete
 - Nearby filtering support
-- Search microservice and gateway
+- Monolithic backend (search and vacancy in a single app)
 - React UI for post/view/modify/delete flows
 - Basic validation, CORS, health endpoints
 - Backend tests for vacancy API
