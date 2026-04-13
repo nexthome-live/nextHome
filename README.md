@@ -1,20 +1,17 @@
 # nextHome
 
-Microserviced web application for posting and finding nearby room/home vacancies.
+Web application for posting and finding nearby room/home vacancies.
 
 ## Architecture
 
-- **vacancy-service (Spring Boot, port 8081)**
+- **nexthome-app (Spring Boot, port 8080)** — single monolithic backend
   - `POST /api/vacancies` to post vacancy and receive a management token
   - `GET /api/vacancies` to view vacancies (supports optional `city` filter)
   - `GET /api/vacancies/{id}` to view a specific vacancy by id
   - `PUT /api/vacancies/{id}` to modify a vacancy with its management token (`X-Management-Token` header or `token` query param)
   - `DELETE /api/vacancies/{id}` to delete a vacancy with its management token (`X-Management-Token` header or `token` query param)
-  - optional nearby filtering via query params: `latitude`, `longitude`, `radiusKm` (only for location-aware search)
-- **search-service (Spring Boot, port 8082)**
-  - `GET /api/search/nearby` (delegates to vacancy-service nearby search)
-- **gateway-service (Spring Cloud Gateway, port 8080)**
-  - routes frontend requests to backend services
+  - optional nearby filtering via query params: `latitude`, `longitude`, `radiusKm`
+  - `GET /api/search/nearby` (nearby search shorthand)
 - **frontend (React + Vite)**
   - Landing screen with two big options: **Post Vacancy**, **View Vacancy**
 
@@ -46,9 +43,7 @@ docker compose up --build
 
 Services:
 - MySQL: `localhost:3306`
-- Vacancy service: `localhost:8081`
-- Search service: `localhost:8082`
-- Gateway service: `localhost:8080`
+- nexthome-app: `localhost:8080`
 
 ## Run locally without Docker
 
@@ -57,9 +52,7 @@ Services:
 ```bash
 cd backend
 mvn clean test
-mvn -pl vacancy-service spring-boot:run
-mvn -pl search-service spring-boot:run
-mvn -pl gateway-service spring-boot:run
+mvn -pl nexthome-app spring-boot:run
 ```
 
 ### Database setup (required for vacancy-service)
@@ -105,9 +98,9 @@ Optional API base URL:
 
 ## Backend deployment to Google Cloud Run
 
-Backend-only deployment files are included:
+Backend deployment files are included:
 
-- `cloudbuild.backend.yaml` (builds + deploys vacancy/search/gateway services to Cloud Run)
+- `cloudbuild.backend.yaml` (builds + deploys nexthome-app to Cloud Run)
 - `.github/workflows/deploy-backend-cloud-run.yml` (GitHub Actions workflow that triggers Cloud Build)
 
 ### Required GitHub repository secrets
@@ -120,9 +113,7 @@ Backend-only deployment files are included:
 - `GCP_PROJECT_ID`
 - `GCP_REGION`
 - `GCP_ARTIFACT_REPOSITORY`
-- `VACANCY_SERVICE_NAME`
-- `SEARCH_SERVICE_NAME`
-- `GATEWAY_SERVICE_NAME`
+- `APP_SERVICE_NAME`
 - `DB_URL` (example: `jdbc:mysql://<host>:3306/vacancy_db`)
 - `DB_USERNAME_SECRET_NAME`
 - `DB_PASSWORD_SECRET_NAME`
@@ -131,15 +122,15 @@ Backend-only deployment files are included:
 ### Notes
 
 - `DB_USERNAME_SECRET_NAME` and `DB_PASSWORD_SECRET_NAME` must already exist in Google Secret Manager.
-- The workflow deploys only backend services (vacancy, search, gateway), not the frontend.
-- Cloud Run ingress is restricted to internal traffic for `vacancy-service` and `search-service`; only `gateway-service` is publicly reachable.
+- The workflow deploys only the backend (nexthome-app), not the frontend.
+- The app is publicly reachable on port 8080.
 
 ## Phase coverage
 
 Implemented now:
-- Vacancy service token-based post/list/update/delete
+- Vacancy token-based post/list/update/delete
 - Nearby filtering support
-- Search microservice and gateway
+- Monolithic backend (search and vacancy in a single app)
 - React UI for post/view/modify/delete flows
 - Basic validation, CORS, health endpoints
 - Backend tests for vacancy API

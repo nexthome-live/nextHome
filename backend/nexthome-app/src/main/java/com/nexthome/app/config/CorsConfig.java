@@ -1,0 +1,45 @@
+package com.nexthome.app.config;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
+
+import java.util.Arrays;
+import java.util.List;
+
+@Configuration
+public class CorsConfig {
+
+    @Value("${cors.allowed-origins:*}")
+    private String allowedOrigins;
+
+    @Value("${cors.allowed-methods:GET,POST,PUT,DELETE,OPTIONS}")
+    private String allowedMethods;
+
+    @Value("${cors.allowed-headers:Content-Type,Accept,Authorization,X-Management-Token}")
+    private String allowedHeaders;
+
+    @Bean
+    public CorsFilter corsFilter() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(false);
+        String trimmedOrigins = allowedOrigins.trim();
+        if (trimmedOrigins.isEmpty() || "*".equals(trimmedOrigins)) {
+            config.setAllowedOriginPatterns(List.of("*"));
+        } else {
+            config.setAllowedOrigins(Arrays.stream(trimmedOrigins.split(","))
+                    .map(String::trim).filter(s -> !s.isEmpty()).toList());
+        }
+        config.setAllowedMethods(Arrays.stream(allowedMethods.split(","))
+                .map(String::trim).filter(s -> !s.isEmpty()).toList());
+        config.setAllowedHeaders(Arrays.stream(allowedHeaders.split(","))
+                .map(String::trim).filter(s -> !s.isEmpty()).toList());
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
+    }
+}

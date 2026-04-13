@@ -36,9 +36,7 @@ jobs:
         run: |
           REGION="${{ vars.GCP_REGION }}"
           REPOSITORY="${{ vars.GCP_ARTIFACT_REPOSITORY }}"
-          VACANCY_SERVICE="${{ vars.VACANCY_SERVICE_NAME }}"
-          SEARCH_SERVICE="${{ vars.SEARCH_SERVICE_NAME }}"
-          GATEWAY_SERVICE="${{ vars.GATEWAY_SERVICE_NAME }}"
+          APP_SERVICE="${{ vars.APP_SERVICE_NAME }}"
           DB_URL="${{ vars.DB_URL }}"
           DB_USERNAME_SECRET="${{ vars.DB_USERNAME_SECRET_NAME }}"
           DB_PASSWORD_SECRET="${{ vars.DB_PASSWORD_SECRET_NAME }}"
@@ -47,9 +45,7 @@ jobs:
           subs=(
             "_REGION=${REGION}"
             "_REPOSITORY=${REPOSITORY}"
-            "_VACANCY_SERVICE=${VACANCY_SERVICE}"
-            "_SEARCH_SERVICE=${SEARCH_SERVICE}"
-            "_GATEWAY_SERVICE=${GATEWAY_SERVICE}"
+            "_APP_SERVICE=${APP_SERVICE}"
             "_DB_URL=${DB_URL}"
             "_DB_USERNAME_SECRET=${DB_USERNAME_SECRET}"
             "_DB_PASSWORD_SECRET=${DB_PASSWORD_SECRET}"
