@@ -1,40 +1,16 @@
-# NOTE: Keep this file in sync with cloudbuild.backend.yaml.
+# NOTE: Keep this file in sync with cloudbuild.yaml.
 steps:
   - name: gcr.io/cloud-builders/docker
     args:
       - build
       - -t
-      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_VACANCY_SERVICE}:$SHORT_SHA
-      - /workspace/backend/vacancy-service
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_APP_SERVICE}:$SHORT_SHA
+      - /workspace/backend/nexthome-app
 
   - name: gcr.io/cloud-builders/docker
     args:
       - push
-      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_VACANCY_SERVICE}:$SHORT_SHA
-
-  - name: gcr.io/cloud-builders/docker
-    args:
-      - build
-      - -t
-      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SEARCH_SERVICE}:$SHORT_SHA
-      - /workspace/backend/search-service
-
-  - name: gcr.io/cloud-builders/docker
-    args:
-      - push
-      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SEARCH_SERVICE}:$SHORT_SHA
-
-  - name: gcr.io/cloud-builders/docker
-    args:
-      - build
-      - -t
-      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_GATEWAY_SERVICE}:$SHORT_SHA
-      - /workspace/backend/gateway-service
-
-  - name: gcr.io/cloud-builders/docker
-    args:
-      - push
-      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_GATEWAY_SERVICE}:$SHORT_SHA
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_APP_SERVICE}:$SHORT_SHA
 
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
     entrypoint: bash
@@ -53,47 +29,21 @@ steps:
           exit 1
         fi
 
-        VACANCY_IMAGE="${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_VACANCY_SERVICE}:$SHORT_SHA"
-        SEARCH_IMAGE="${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SEARCH_SERVICE}:$SHORT_SHA"
-        GATEWAY_IMAGE="${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_GATEWAY_SERVICE}:$SHORT_SHA"
+        APP_IMAGE="${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_APP_SERVICE}:$SHORT_SHA"
 
-        # Internal ingress keeps these services private to GCP internal traffic.
-        # allow-unauthenticated is limited to that internal ingress scope.
-        VACANCY_URL=$$(gcloud run deploy "${_VACANCY_SERVICE}" \
-          --image "$$VACANCY_IMAGE" \
-          --region "${_REGION}" \
-          --platform managed \
-          --allow-unauthenticated \
-          --ingress internal \
-          --port 8080 \
-          --set-env-vars "SERVER_PORT=8080,DB_URL=${_DB_URL}" \
-          --set-secrets "DB_USERNAME=${_DB_USERNAME_SECRET}:latest,DB_PASSWORD=${_DB_PASSWORD_SECRET}:latest" \
-          --format='value(status.url)')
-
-        SEARCH_URL=$$(gcloud run deploy "${_SEARCH_SERVICE}" \
-          --image "$$SEARCH_IMAGE" \
-          --region "${_REGION}" \
-          --platform managed \
-          --allow-unauthenticated \
-          --ingress internal \
-          --port 8080 \
-          --set-env-vars "SERVER_PORT=8080,VACANCY_SERVICE_URL=$$VACANCY_URL" \
-          --format='value(status.url)')
-
-        gcloud run deploy "${_GATEWAY_SERVICE}" \
-          --image "$$GATEWAY_IMAGE" \
+        gcloud run deploy "${_APP_SERVICE}" \
+          --image "$$APP_IMAGE" \
           --region "${_REGION}" \
           --platform managed \
           --allow-unauthenticated \
           --port 8080 \
-          --set-env-vars "^|^SERVER_PORT=8080|VACANCY_SERVICE_URL=$$VACANCY_URL|SEARCH_SERVICE_URL=$$SEARCH_URL|CORS_ALLOWED_ORIGINS=${_CORS_ALLOWED_ORIGINS}"
+          --set-env-vars "^|^SERVER_PORT=8080|DB_URL=${_DB_URL}|CORS_ALLOWED_ORIGINS=${_CORS_ALLOWED_ORIGINS}" \
+          --set-secrets "DB_USERNAME=${_DB_USERNAME_SECRET}:latest,DB_PASSWORD=${_DB_PASSWORD_SECRET}:latest"
 
 substitutions:
   _REGION: us-central1
   _REPOSITORY: nexthome-backend
-  _VACANCY_SERVICE: vacancy-service
-  _SEARCH_SERVICE: search-service
-  _GATEWAY_SERVICE: gateway-service
+  _APP_SERVICE: nexthome-app
   # Must be overridden during deployment (workflow variable: DB_URL).
   # Expected format: jdbc:mysql://<host>:<port>/<database>
   _DB_URL: invalid://must-set-db-url
