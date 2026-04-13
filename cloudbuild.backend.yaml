@@ -84,6 +84,7 @@ substitutions:
   _SEARCH_SERVICE: search-service
   _GATEWAY_SERVICE: gateway-service
   # Must be overridden during deployment (workflow variable: DB_URL).
+  # Expected format: jdbc:mysql://<host>:<port>/<database>
   _DB_URL: MUST_SET_DB_URL
   _DB_USERNAME_SECRET: vacancy-db-username
   _DB_PASSWORD_SECRET: vacancy-db-password

@@ -123,7 +123,7 @@ Backend-only deployment files are included:
 - `VACANCY_SERVICE_NAME`
 - `SEARCH_SERVICE_NAME`
 - `GATEWAY_SERVICE_NAME`
-- `DB_URL`
+- `DB_URL` (example: `jdbc:mysql://<host>:3306/vacancy_db`)
 - `DB_USERNAME_SECRET_NAME`
 - `DB_PASSWORD_SECRET_NAME`
 - `CORS_ALLOWED_ORIGINS`
