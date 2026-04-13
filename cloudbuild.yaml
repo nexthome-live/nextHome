@@ -44,7 +44,7 @@ steps:
         set -euo pipefail
 
         if [[ "${_DB_URL}" == "invalid://must-set-db-url" ]]; then
-          echo "ERROR: _DB_URL must be overridden with a valid JDBC URL." >&2
+          echo "ERROR: _DB_URL must be overridden with a valid database URL." >&2
           exit 1
         fi
 
