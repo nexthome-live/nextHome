@@ -46,6 +46,8 @@ steps:
         SEARCH_IMAGE="${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SEARCH_SERVICE}:$SHORT_SHA"
         GATEWAY_IMAGE="${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_GATEWAY_SERVICE}:$SHORT_SHA"
 
+        # Internal ingress keeps these services private to GCP internal traffic.
+        # allow-unauthenticated is limited to that internal ingress scope.
         VACANCY_URL=$$(gcloud run deploy "${_VACANCY_SERVICE}" \
           --image "$$VACANCY_IMAGE" \
           --region "${_REGION}" \
@@ -81,7 +83,7 @@ substitutions:
   _VACANCY_SERVICE: vacancy-service
   _SEARCH_SERVICE: search-service
   _GATEWAY_SERVICE: gateway-service
-  _DB_URL: REQUIRED_SET_DB_URL
+  _DB_URL: MUST_SET_DB_URL
   _DB_USERNAME_SECRET: vacancy-db-username
   _DB_PASSWORD_SECRET: vacancy-db-password
   _CORS_ALLOWED_ORIGINS: https://nexthome-live.github.io
