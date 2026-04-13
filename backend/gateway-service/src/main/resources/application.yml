@@ -9,7 +9,7 @@ spring:
         add-to-simple-url-handler-mapping: true
         cors-configurations:
           '[/**]':
-            allowedOrigins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:4173}
+            allowedOrigins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:4173,https://nexthome-live.github.io}
             allowedMethods: ${CORS_ALLOWED_METHODS:GET,POST,PUT,DELETE,OPTIONS}
             allowedHeaders: ${CORS_ALLOWED_HEADERS:Content-Type,Accept,Authorization,X-Management-Token}
       routes:
