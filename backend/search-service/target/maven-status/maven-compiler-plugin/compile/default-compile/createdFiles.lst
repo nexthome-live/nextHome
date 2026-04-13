@@ -1,7 +1,0 @@
-com/nexthome/search/config/AppConfig.class
-com/nexthome/search/dto/VacancyResponse.class
-com/nexthome/search/client/VacancyClient$1.class
-com/nexthome/search/controller/SearchController.class
-com/nexthome/search/SearchServiceApplication.class
-com/nexthome/search/client/VacancyClient.class
-com/nexthome/search/service/SearchService.class

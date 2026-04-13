@@ -1,6 +1,0 @@
-/home/runner/work/nextHome/nextHome/backend/search-service/src/main/java/com/nexthome/search/SearchServiceApplication.java
-/home/runner/work/nextHome/nextHome/backend/search-service/src/main/java/com/nexthome/search/client/VacancyClient.java
-/home/runner/work/nextHome/nextHome/backend/search-service/src/main/java/com/nexthome/search/config/AppConfig.java
-/home/runner/work/nextHome/nextHome/backend/search-service/src/main/java/com/nexthome/search/controller/SearchController.java
-/home/runner/work/nextHome/nextHome/backend/search-service/src/main/java/com/nexthome/search/dto/VacancyResponse.java
-/home/runner/work/nextHome/nextHome/backend/search-service/src/main/java/com/nexthome/search/service/SearchService.java
