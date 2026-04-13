@@ -103,37 +103,6 @@ npm run dev
 Optional API base URL:
 - `VITE_API_BASE_URL` (default: `http://localhost:8080`)
 
-## Backend deployment to Google Cloud Run
-
-Backend-only deployment files are included:
-
-- `cloudbuild.backend.yaml` (builds + deploys vacancy/search/gateway services to Cloud Run)
-- `.github/workflows/deploy-backend-cloud-run.yml` (GitHub Actions workflow that triggers Cloud Build)
-
-### Required GitHub repository secrets
-
-- `GCP_WORKLOAD_IDENTITY_PROVIDER`
-- `GCP_SERVICE_ACCOUNT`
-
-### Required GitHub repository variables
-
-- `GCP_PROJECT_ID`
-- `GCP_REGION`
-- `GCP_ARTIFACT_REPOSITORY`
-- `VACANCY_SERVICE_NAME`
-- `SEARCH_SERVICE_NAME`
-- `GATEWAY_SERVICE_NAME`
-- `DB_URL` (example: `jdbc:mysql://<host>:3306/vacancy_db`)
-- `DB_USERNAME_SECRET_NAME`
-- `DB_PASSWORD_SECRET_NAME`
-- `CORS_ALLOWED_ORIGINS`
-
-### Notes
-
-- `DB_USERNAME_SECRET_NAME` and `DB_PASSWORD_SECRET_NAME` must already exist in Google Secret Manager.
-- The workflow deploys only backend services (vacancy, search, gateway), not the frontend.
-- Cloud Run ingress is restricted to internal traffic for `vacancy-service` and `search-service`; only `gateway-service` is publicly reachable.
-
 ## Phase coverage
 
 Implemented now:
