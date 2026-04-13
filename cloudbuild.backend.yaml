@@ -1,3 +1,4 @@
+# NOTE: Keep this file in sync with cloudbuild.yaml.
 steps:
   - name: gcr.io/cloud-builders/docker
     args:
@@ -42,6 +43,16 @@ steps:
       - |
         set -euo pipefail
 
+        if [[ "${_DB_URL}" == "invalid://must-set-db-url" ]]; then
+          echo "ERROR: _DB_URL must be overridden with a valid JDBC URL." >&2
+          exit 1
+        fi
+
+        if [[ -z "${_DB_USERNAME_SECRET}" || -z "${_DB_PASSWORD_SECRET}" ]]; then
+          echo "ERROR: _DB_USERNAME_SECRET and _DB_PASSWORD_SECRET must be set." >&2
+          exit 1
+        fi
+
         VACANCY_IMAGE="${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_VACANCY_SERVICE}:$SHORT_SHA"
         SEARCH_IMAGE="${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SEARCH_SERVICE}:$SHORT_SHA"
         GATEWAY_IMAGE="${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_GATEWAY_SERVICE}:$SHORT_SHA"
@@ -75,7 +86,7 @@ steps:
           --platform managed \
           --allow-unauthenticated \
           --port 8080 \
-          --set-env-vars "SERVER_PORT=8080,VACANCY_SERVICE_URL=$$VACANCY_URL,SEARCH_SERVICE_URL=$$SEARCH_URL,CORS_ALLOWED_ORIGINS=${_CORS_ALLOWED_ORIGINS}"
+          --set-env-vars "^|^SERVER_PORT=8080|VACANCY_SERVICE_URL=$$VACANCY_URL|SEARCH_SERVICE_URL=$$SEARCH_URL|CORS_ALLOWED_ORIGINS=${_CORS_ALLOWED_ORIGINS}"
 
 substitutions:
   _REGION: us-central1
