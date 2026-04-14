@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import './App.css'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8083'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://nexthome-app-335683755221.us-central1.run.app'
 
 const initialForm = {
   title: '',
