@@ -132,7 +132,7 @@ If you want to configure runtime values directly on Cloud Run:
 1) Create an env file from `backend/nexthome-app/env.cloudrun.yaml.example`:
 
 ```bash
-cp backend/nexthome-app/env.cloudrun.yaml.example env.yaml
+cp backend/nexthome-app/env.cloudrun.yaml.example backend/nexthome-app/env.yaml
 ```
 
 2) Store database password in Secret Manager:
@@ -152,12 +152,13 @@ echo -n 'YOUR_DB_PASSWORD' | gcloud secrets versions add nexthome-db-password --
 ```bash
 gcloud run services update <SERVICE_NAME> \
   --region <REGION> \
-  --env-vars-file env.yaml \
+  --env-vars-file backend/nexthome-app/env.yaml \
   --set-secrets DB_PASSWORD=nexthome-db-password:latest
 ```
 
 4) Notes:
 - Cloud Run provides `PORT` automatically; do not set it manually.
+- The template uses `sslMode=REQUIRED`, which is valid for MySQL Connector/J 8+.
 - Rotate any previously exposed DB credentials after migrating to Secret Manager.
 
 ## Phase coverage
