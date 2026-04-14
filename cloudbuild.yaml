@@ -1,17 +1,25 @@
-# NOTE: Keep this file in sync with cloudbuild.backend.yaml.
 steps:
+  # ✅ STEP 1: Build JAR (IMPORTANT)
+  - name: maven:3.9.6-eclipse-temurin-17
+    entrypoint: mvn
+    args: ["clean", "package", "-DskipTests"]
+    dir: backend/nexthome-app
+
+  # ✅ STEP 2: Build Docker image
   - name: gcr.io/cloud-builders/docker
     args:
       - build
       - -t
       - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_APP_SERVICE}:$SHORT_SHA
-      - /workspace/backend/nexthome-app
+      - backend/nexthome-app   # ✅ fixed path
 
+  # ✅ STEP 3: Push image
   - name: gcr.io/cloud-builders/docker
     args:
       - push
       - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_APP_SERVICE}:$SHORT_SHA
 
+  # ✅ STEP 4: Deploy to Cloud Run
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
     entrypoint: bash
     args:
@@ -44,8 +52,6 @@ substitutions:
   _REGION: us-central1
   _REPOSITORY: nexthome-backend
   _APP_SERVICE: nexthome-app
-  # Must be overridden during deployment (workflow variable: DB_URL).
-  # Expected format: jdbc:mysql://<host>:<port>/<database>
   _DB_URL: invalid://must-set-db-url
   _DB_USERNAME_SECRET: vacancy-db-username
   _DB_PASSWORD_SECRET: vacancy-db-password
