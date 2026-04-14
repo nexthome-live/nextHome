@@ -118,6 +118,7 @@ Backend deployment files are included:
 - `DB_USERNAME_SECRET_NAME`
 - `DB_PASSWORD_SECRET_NAME`
 - `CORS_ALLOWED_ORIGINS`
+  - Comma-separated list of allowed origins (example: `http://localhost:5173,http://localhost:4173,https://nexthome-live.github.io`)
 
 ### Notes
 
