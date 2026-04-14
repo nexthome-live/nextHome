@@ -11,7 +11,7 @@ spring:
     open-in-view: false
 
 server:
-  port: ${PORT:8083}
+  port: ${PORT:8080}
 
 cors:
   allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:4173,https://nexthome-live.github.io}
