@@ -138,13 +138,13 @@ cp backend/nexthome-app/env.cloudrun.yaml.example env.yaml
 2) Store database password in Secret Manager:
 
 ```bash
-echo -n '<DB_PASSWORD>' | gcloud secrets create nexthome-db-password --data-file=-
+echo -n 'YOUR_DB_PASSWORD' | gcloud secrets create nexthome-db-password --data-file=-
 ```
 
 If the secret already exists, add a new version:
 
 ```bash
-echo -n '<DB_PASSWORD>' | gcloud secrets versions add nexthome-db-password --data-file=-
+echo -n 'YOUR_DB_PASSWORD' | gcloud secrets versions add nexthome-db-password --data-file=-
 ```
 
 3) Update Cloud Run service:
