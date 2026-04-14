@@ -1,61 +1,37 @@
 steps:
-  # ✅ STEP 1: Build JAR (IMPORTANT)
+  # STEP 1: Build JAR
   - name: maven:3.9.6-eclipse-temurin-17
     entrypoint: mvn
     args: ["clean", "package", "-DskipTests"]
     dir: backend/nexthome-app
 
-  # ✅ STEP 2: Build Docker image
+  # STEP 2: Build Docker image
   - name: gcr.io/cloud-builders/docker
     args:
       - build
       - -t
-      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_APP_SERVICE}:$SHORT_SHA
-      - backend/nexthome-app   # ✅ fixed path
+      - us-central1-docker.pkg.dev/dogood-488720/nexthome-backend/nexthome-app:latest
+      - backend/nexthome-app
 
-  # ✅ STEP 3: Push image
+  # STEP 3: Push image
   - name: gcr.io/cloud-builders/docker
     args:
       - push
-      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_APP_SERVICE}:$SHORT_SHA
+      - us-central1-docker.pkg.dev/dogood-488720/nexthome-backend/nexthome-app:latest
 
-  # ✅ STEP 4: Deploy to Cloud Run
+  # STEP 4: Deploy to Cloud Run
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
     entrypoint: bash
     args:
       - -c
       - |
-        set -euo pipefail
-
-        if [[ "${_DB_URL}" == "invalid://must-set-db-url" ]]; then
-          echo "ERROR: _DB_URL must be overridden with a valid database URL." >&2
-          exit 1
-        fi
-
-        if [[ -z "${_DB_USERNAME_SECRET}" || -z "${_DB_PASSWORD_SECRET}" ]]; then
-          echo "ERROR: _DB_USERNAME_SECRET and _DB_PASSWORD_SECRET must be set." >&2
-          exit 1
-        fi
-
-        APP_IMAGE="${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_APP_SERVICE}:$SHORT_SHA"
-
-        gcloud run deploy "${_APP_SERVICE}" \
-          --image "$$APP_IMAGE" \
-          --region "${_REGION}" \
+        gcloud run deploy nexthome-app \
+          --image us-central1-docker.pkg.dev/dogood-488720/nexthome-backend/nexthome-app:latest \
+          --region us-central1 \
           --platform managed \
           --allow-unauthenticated \
-          --port 8080 \
-          --set-env-vars "^|^SERVER_PORT=8080|DB_URL=${_DB_URL}|CORS_ALLOWED_ORIGINS=${_CORS_ALLOWED_ORIGINS}" \
-          --set-secrets "DB_USERNAME=${_DB_USERNAME_SECRET}:latest,DB_PASSWORD=${_DB_PASSWORD_SECRET}:latest"
-
-substitutions:
-  _REGION: us-central1
-  _REPOSITORY: nexthome-backend
-  _APP_SERVICE: nexthome-app
-  _DB_URL: invalid://must-set-db-url
-  _DB_USERNAME_SECRET: vacancy-db-username
-  _DB_PASSWORD_SECRET: vacancy-db-password
-  _CORS_ALLOWED_ORIGINS: https://nexthome-live.github.io
+          --port 8083 \
+          --set-env-vars "SERVER_PORT=8080,DB_URL=jdbc:mysql://nexthome-nexthome.l.aivencloud.com:14560/vacancy_db,CORS_ALLOWED_ORIGINS=https://nexthome-live.github.io,DB_USERNAME=avnadmin,DB_PASSWORD=AVNS_gnhYrsECOIB0hcmdylj"
 
 options:
   logging: CLOUD_LOGGING_ONLY
