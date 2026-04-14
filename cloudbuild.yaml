@@ -31,7 +31,7 @@ steps:
           --platform managed \
           --allow-unauthenticated \
           --port 8080 \
-          --set-env-vars "SERVER_PORT=8080,DB_URL=jdbc:mysql://nexthome-nexthome.l.aivencloud.com:14556/vacancy_db,CORS_ALLOWED_ORIGINS=https://nexthome-live.github.io,DB_USERNAME=avnadmin,DB_PASSWORD=AVNS_gnhYrsECOIB0hcmdylj"
+          --set-env-vars "SERVER_PORT=8080,DB_URL=jdbc:mysql://nexthome-nexthome.l.aivencloud.com:14556/vacancy_db,CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:4173,https://nexthome-live.github.io,DB_USERNAME=avnadmin,DB_PASSWORD=AVNS_gnhYrsECOIB0hcmdylj"
 
 options:
   logging: CLOUD_LOGGING_ONLY
