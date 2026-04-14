@@ -114,12 +114,17 @@ Backend deployment files are included:
 - `GCP_REGION`
 - `GCP_ARTIFACT_REPOSITORY`
 - `APP_SERVICE_NAME`
+- `RUNTIME_SERVICE_ACCOUNT` (recommended; if unset, workflow falls back to `GCP_SERVICE_ACCOUNT`)
 - `DB_URL` (example: `jdbc:mysql://<host>:3306/vacancy_db`)
+- `DB_USERNAME_SECRET_NAME`
+- `DB_PASSWORD_SECRET_NAME`
 - `CORS_ALLOWED_ORIGINS`
   - Comma-separated list of allowed origins (example: `http://localhost:5173,http://localhost:4173,https://nexthome-live.github.io`)
 
 ### Notes
 
+- `RUNTIME_SERVICE_ACCOUNT` must have `roles/secretmanager.secretAccessor` on the DB secrets.
+- `DB_USERNAME_SECRET_NAME` and `DB_PASSWORD_SECRET_NAME` must already exist in Google Secret Manager.
 - The workflow deploys only the backend (nexthome-app), not the frontend.
 - The app is publicly reachable on port 8080.
 

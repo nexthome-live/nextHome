@@ -24,6 +24,16 @@ steps:
           exit 1
         fi
 
+        if [[ -z "${_RUNTIME_SERVICE_ACCOUNT}" ]]; then
+          echo "ERROR: _RUNTIME_SERVICE_ACCOUNT must be set." >&2
+          exit 1
+        fi
+
+        if [[ -z "${_DB_USERNAME_SECRET}" || -z "${_DB_PASSWORD_SECRET}" ]]; then
+          echo "ERROR: _DB_USERNAME_SECRET and _DB_PASSWORD_SECRET must be set." >&2
+          exit 1
+        fi
+
         APP_IMAGE="${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_APP_SERVICE}:$SHORT_SHA"
 
         gcloud run deploy "${_APP_SERVICE}" \
@@ -31,18 +41,22 @@ steps:
           --region "${_REGION}" \
           --platform managed \
           --allow-unauthenticated \
+          --service-account "${_RUNTIME_SERVICE_ACCOUNT}" \
           --port 8080 \
-          --set-env-vars "^|^SERVER_PORT=8080|DB_URL=${_DB_URL}|DB_USERNAME=${_DB_USERNAME}|DB_PASSWORD=${_DB_PASSWORD}|CORS_ALLOWED_ORIGINS=${_CORS_ALLOWED_ORIGINS}"
+          --set-env-vars "^|^SERVER_PORT=8080|DB_URL=${_DB_URL}|CORS_ALLOWED_ORIGINS=${_CORS_ALLOWED_ORIGINS}" \
+          --set-secrets "DB_USERNAME=${_DB_USERNAME_SECRET}:latest,DB_PASSWORD=${_DB_PASSWORD_SECRET}:latest"
 
 substitutions:
   _REGION: us-central1
   _REPOSITORY: nexthome-backend
   _APP_SERVICE: nexthome-app
+  # Must be overridden with a service account that has Secret Manager access.
+  _RUNTIME_SERVICE_ACCOUNT: ""
   # Must be overridden during deployment (workflow variable: DB_URL).
   # Expected format: jdbc:mysql://<host>:<port>/<database>
   _DB_URL: invalid://must-set-db-url
-  _DB_USERNAME: avnadmin
-  _DB_PASSWORD: AVNS_gnhYrsECOIB0hcmdylj
+  _DB_USERNAME_SECRET: vacancy-db-username
+  _DB_PASSWORD_SECRET: vacancy-db-password
   _CORS_ALLOWED_ORIGINS: http://localhost:5173,http://localhost:4173,https://nexthome-live.github.io
 
 options:
