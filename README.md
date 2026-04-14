@@ -125,6 +125,41 @@ Backend deployment files are included:
 - The workflow deploys only the backend (nexthome-app), not the frontend.
 - The app is publicly reachable on port 8080.
 
+### Manual Cloud Run env var setup
+
+If you want to configure runtime values directly on Cloud Run:
+
+1) Create an env file from `backend/nexthome-app/env.cloudrun.yaml.example`:
+
+```bash
+cp backend/nexthome-app/env.cloudrun.yaml.example env.yaml
+```
+
+2) Store database password in Secret Manager:
+
+```bash
+echo -n '<DB_PASSWORD>' | gcloud secrets create nexthome-db-password --data-file=-
+```
+
+If the secret already exists, add a new version:
+
+```bash
+echo -n '<DB_PASSWORD>' | gcloud secrets versions add nexthome-db-password --data-file=-
+```
+
+3) Update Cloud Run service:
+
+```bash
+gcloud run services update <SERVICE_NAME> \
+  --region <REGION> \
+  --env-vars-file env.yaml \
+  --set-secrets DB_PASSWORD=nexthome-db-password:latest
+```
+
+4) Notes:
+- Cloud Run provides `PORT` automatically; do not set it manually.
+- Rotate any previously exposed DB credentials after migrating to Secret Manager.
+
 ## Phase coverage
 
 Implemented now:
